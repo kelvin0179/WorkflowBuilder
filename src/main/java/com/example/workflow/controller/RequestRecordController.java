@@ -3,6 +3,7 @@ package com.example.workflow.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,11 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.workflow.DTO.RequestRecordDTO;
 import com.example.workflow.DTO.RequestRecordIdMap;
+import com.example.workflow.DTO.WorkOrderByIdPage;
 import com.example.workflow.DTO.WorkOrderPageDTO;
 import com.example.workflow.model.RequestRecord;
 import com.example.workflow.model.WorkOrder;
 import com.example.workflow.services.RequestRecordService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -49,4 +52,8 @@ public class RequestRecordController {
 		return requestRecordService.getWorkflowDataToWorkOrderPage();
 	}
 	
+	@GetMapping("/workOrderIdPageData/{id}")
+	public WorkOrderByIdPage getWorkOrderByIdPage(@PathVariable("id") Integer workflowId) {
+		return requestRecordService.getWorkOrderByIdPage(workflowId);
+	}
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.workflow.DTO.RequestRecordDTO;
 import com.example.workflow.DTO.RequestRecordIdMap;
+import com.example.workflow.DTO.WorkOrderByIdPage;
 import com.example.workflow.DTO.WorkOrderPageDTO;
 import com.example.workflow.comparator.CarriersComparator;
 import com.example.workflow.model.Carrier;
@@ -202,7 +203,7 @@ public class RequestRecordService {
 		workOrder=requestRecord.getWorkOrder().toBuilder().build();
 
 		if(requestRecord.status==RequestRecord.Status.Accepted){
-			requestRecordRepository.deleteByWorkOrder(workOrder);
+			// requestRecordRepository.deleteByWorkOrder(workOrder);
 			workOrder.setStatus(WorkOrder.Status.Accepted);
 			workOrderRepository.save(workOrder);
 			return;
@@ -210,7 +211,7 @@ public class RequestRecordService {
 		switch (operationType) {
 			case "BroadCast Request to All":{
 				if(requestRecordRepository.findByWorkOrderAndStatus(requestRecord.getWorkOrder(),RequestRecord.Status.Assigned).isEmpty()){
-					requestRecordRepository.deleteByWorkOrder(workOrder);
+					// requestRecordRepository.deleteByWorkOrder(workOrder);
 					workOrder.setStatus(WorkOrder.Status.Rejected);
 					workOrderRepository.save(workOrder);
 				}		
@@ -218,7 +219,7 @@ public class RequestRecordService {
 			}
 			case "Send Request by Priority Search":{
 				if(!cycleForPriorityRequest(requestRecord.getWorkflow().getNodes(), requestRecord.getWorkflow().getEdges())){
-					requestRecordRepository.deleteByWorkOrder(workOrder);
+					// requestRecordRepository.deleteByWorkOrder(workOrder);
 					workOrder.setStatus(WorkOrder.Status.Rejected);
 					workOrderRepository.save(workOrder);
 					break;
@@ -239,7 +240,7 @@ public class RequestRecordService {
 				}
 				carriers.removeAll(rejectedCarriers);
 				if(carriers.isEmpty()){
-					requestRecordRepository.deleteByWorkOrder(workOrder);
+					// requestRecordRepository.deleteByWorkOrder(workOrder);
 					workOrder.setStatus(WorkOrder.Status.Rejected);
 					workOrderRepository.save(workOrder);
 					break;
@@ -274,5 +275,19 @@ public class RequestRecordService {
 					.build());
 		}
 		return result;
+	}
+	public WorkOrderByIdPage getWorkOrderByIdPage(int workOrderId){
+		WorkOrder workOrder = workOrderRepository.findById(workOrderId).get().toBuilder().build();
+		RequestRecord requestRecord = requestRecordRepository.findByWorkOrder(workOrder).get(0);
+		WorkOrderByIdPage workOrderByIdPage = WorkOrderByIdPage.builder()
+												.origin(workOrder.getOrigin())
+												.destination(workOrder.getDestination())
+												.status(workOrder.getStatus())
+												.workflowName(requestRecord.getWorkflow().getName())
+												.cost(requestRecord.getCost())
+												.time(requestRecord.getTime())
+												.capacity(requestRecord.getCapacity())
+												.build();
+		return workOrderByIdPage;
 	}
 }

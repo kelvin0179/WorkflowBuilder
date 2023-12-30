@@ -14,6 +14,8 @@ public interface RequestRecordRepository extends JpaRepository<RequestRecord, In
     public List<RequestRecord> findByWorkOrderAndStatus(WorkOrder workOrder,RequestRecord.Status status);
 
     public void deleteByWorkOrder(WorkOrder workorder);
+
+    public List<RequestRecord> findByWorkOrder(WorkOrder workOrder);
     
     @Query("SELECT rr FROM RequestRecord rr " +
             "WHERE rr.workflow.id = :workflowId " +
