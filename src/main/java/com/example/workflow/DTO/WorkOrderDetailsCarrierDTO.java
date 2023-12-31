@@ -15,13 +15,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class WorkOrderByIdPage {
-	private String origin;
-	private String destination;
-	private WorkOrder.Status status;
-	private String workflowName;
+public class WorkOrderDetailsCarrierDTO {
+	private Integer carrierId;
+	private String truckId;
 	private Integer cost;
 	private Integer time;
 	private Integer capacity;
-	private List<WorkOrderDetailsCarrierDTO> carriers;
+	private RequestRecord.Status status;
 }

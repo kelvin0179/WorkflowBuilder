@@ -38,10 +38,14 @@ public class WorkflowService {
 		List<Edges> edges=new ArrayList<Edges>(workflow.getEdges());
 //		System.out.println(workflow);
 		if(workflow.getId()==0){
+			newWorkflow.setName(workflow.getName());
 			newWorkflow=workflowRepository.save(newWorkflow).toBuilder().build();
 		}
 		else{
-			newWorkflow=workflow.toBuilder().build();
+			// newWorkflow=workflow.toBuilder().build();
+			newWorkflow=workflowRepository.findById(workflow.getId()).get();
+			newWorkflow.setName(workflow.getName());
+			newWorkflow=workflowRepository.save(newWorkflow).toBuilder().build();
 		}
 		nodesRepository.deleteByCompositeId_WorkflowId(newWorkflow.getId());
 		edgesRepository.deleteByCompositeId_WorkflowId(newWorkflow.getId());

@@ -1,5 +1,6 @@
 package com.example.workflow.controller;
 
+import com.example.workflow.DTO.CarrierPageDTO;
 import com.example.workflow.model.Carriers;
 import com.example.workflow.services.CarriersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ public class CarriersController {
 
 	@Autowired
     private CarriersService carriersService;
-
 
     @GetMapping
     public List<Carriers> getAllCarriers() {
@@ -41,5 +41,10 @@ public class CarriersController {
     public ResponseEntity<List<Carriers>> createCarriersBatch(@RequestBody List<Carriers> carriersList) {
         List<Carriers> createdCarriers = carriersService.createCarriersBatch(carriersList);
         return new ResponseEntity<>(createdCarriers, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/carrierPage")
+    public ResponseEntity<List<CarrierPageDTO>> getCarriersDTO(){
+        return ResponseEntity.ok(carriersService.getAllCarrierPageDTOs());
     }
 }

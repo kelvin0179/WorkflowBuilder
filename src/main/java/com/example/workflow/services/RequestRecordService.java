@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.workflow.DTO.RequestRecordDTO;
 import com.example.workflow.DTO.RequestRecordIdMap;
 import com.example.workflow.DTO.WorkOrderByIdPage;
+import com.example.workflow.DTO.WorkOrderDetailsCarrierDTO;
 import com.example.workflow.DTO.WorkOrderPageDTO;
 import com.example.workflow.comparator.CarriersComparator;
 import com.example.workflow.model.Carrier;
@@ -203,7 +204,7 @@ public class RequestRecordService {
 		workOrder=requestRecord.getWorkOrder().toBuilder().build();
 
 		if(requestRecord.status==RequestRecord.Status.Accepted){
-			// requestRecordRepository.deleteByWorkOrder(workOrder);
+			requestRecordRepository.deleteByWorkOrderAndStatus(workOrder, RequestRecord.Status.Assigned);
 			workOrder.setStatus(WorkOrder.Status.Accepted);
 			workOrderRepository.save(workOrder);
 			return;
@@ -278,7 +279,20 @@ public class RequestRecordService {
 	}
 	public WorkOrderByIdPage getWorkOrderByIdPage(int workOrderId){
 		WorkOrder workOrder = workOrderRepository.findById(workOrderId).get().toBuilder().build();
-		RequestRecord requestRecord = requestRecordRepository.findByWorkOrder(workOrder).get(0);
+		List<RequestRecord> requestRecords=requestRecordRepository.findByWorkOrder(workOrder);
+		RequestRecord requestRecord = requestRecords.get(0);
+		List<WorkOrderDetailsCarrierDTO> carriers=new ArrayList<>();
+		
+		for(RequestRecord requestRecordIt : requestRecords){
+			carriers.add(WorkOrderDetailsCarrierDTO.builder()
+							.carrierId(requestRecordIt.getCarriers().getCapacity())
+							.truckId(requestRecordIt.getCarriers().getTruckId())
+							.cost(requestRecordIt.getCarriers().getCost())
+							.time(requestRecordIt.getCarriers().getTime())
+							.capacity(requestRecordIt.getCarriers().getCapacity())
+							.status(requestRecordIt.getStatus())
+							.build());
+		}
 		WorkOrderByIdPage workOrderByIdPage = WorkOrderByIdPage.builder()
 												.origin(workOrder.getOrigin())
 												.destination(workOrder.getDestination())
@@ -287,6 +301,7 @@ public class RequestRecordService {
 												.cost(requestRecord.getCost())
 												.time(requestRecord.getTime())
 												.capacity(requestRecord.getCapacity())
+												.carriers(carriers)
 												.build();
 		return workOrderByIdPage;
 	}

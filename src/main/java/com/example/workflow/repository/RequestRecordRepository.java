@@ -15,6 +15,8 @@ public interface RequestRecordRepository extends JpaRepository<RequestRecord, In
 
     public void deleteByWorkOrder(WorkOrder workorder);
 
+    public void deleteByWorkOrderAndStatus(WorkOrder workorder,RequestRecord.Status status);
+
     public List<RequestRecord> findByWorkOrder(WorkOrder workOrder);
     
     @Query("SELECT rr FROM RequestRecord rr " +
@@ -26,4 +28,6 @@ public interface RequestRecordRepository extends JpaRepository<RequestRecord, In
             @Param("workOrderId") int workOrderId,
             @Param("carriersId") int carriersId
     );
+
+    List<RequestRecord> findByStatus(RequestRecord.Status status);
 }
