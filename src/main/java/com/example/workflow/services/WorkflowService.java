@@ -12,6 +12,7 @@ import com.example.workflow.model.Edges;
 import com.example.workflow.model.EdgesComposite;
 import com.example.workflow.model.Nodes;
 import com.example.workflow.model.NodesComposite;
+import com.example.workflow.model.WorkOrder;
 import com.example.workflow.model.Workflow;
 import com.example.workflow.repository.EdgesRepository;
 import com.example.workflow.repository.NodesRepository;
