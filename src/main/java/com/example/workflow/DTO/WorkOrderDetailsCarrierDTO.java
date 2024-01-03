@@ -21,5 +21,6 @@ public class WorkOrderDetailsCarrierDTO {
 	private Integer cost;
 	private Integer time;
 	private Integer capacity;
+	private String loadType;
 	private RequestRecord.Status status;
 }

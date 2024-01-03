@@ -35,11 +35,6 @@ public class Carriers {
 	
 	public int capacity;
 	
-	@Enumerated(EnumType.STRING)
-    public LoadType loadType;
+    public String loadType;
 
-    public enum LoadType {
-        LCL,
-        FCL
-    }
 }

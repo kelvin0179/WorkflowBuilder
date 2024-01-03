@@ -30,8 +30,10 @@ import com.example.workflow.repository.WorkflowRepository;
 import ch.qos.logback.core.pattern.parser.Node;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 
@@ -109,30 +111,39 @@ public class RequestRecordService {
 		}
 		return numEdges==2;
 	}
-	public List<Carriers> dynamicParamsQuery(RequestRecordDTO requestRecordDTO){
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Carriers> criteriaQuery=cb.createQuery(Carriers.class);
-		Root<Carriers> root=criteriaQuery.from(Carriers.class);
+	public List<Carriers> dynamicParamsQuery(RequestRecordDTO requestRecordDTO) {
+	    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+	    CriteriaQuery<Carriers> criteriaQuery = cb.createQuery(Carriers.class);
+	    Root<Carriers> root = criteriaQuery.from(Carriers.class);
 
-		if(requestRecordDTO.getCost()!=null){
-			criteriaQuery.select(root).where(cb.lessThanOrEqualTo(root.get(Carriers_.cost), requestRecordDTO.getCost()));
-		}
-		if(requestRecordDTO.getTime()!=null){
-			criteriaQuery.select(root).where(cb.lessThanOrEqualTo(root.get(Carriers_.time), requestRecordDTO.getTime()));
-		}
-		if(requestRecordDTO.getCapacity()!=null){
-			criteriaQuery.select(root).where(cb.greaterThanOrEqualTo(root.get(Carriers_.capacity), requestRecordDTO.getCapacity()));
-		}
-		criteriaQuery.select(root).where(cb.equal(root.get(Carriers_.origin), requestRecordDTO.getOrigin()));
-		criteriaQuery.select(root).where(cb.equal(root.get(Carriers_.destination), requestRecordDTO.getDestination()));
-		return entityManager.createQuery(criteriaQuery).getResultList();
+	    List<Predicate> predicates = new ArrayList<>();
+
+	    if (requestRecordDTO.getCost() != null) {
+	        predicates.add(cb.lessThanOrEqualTo(root.get("cost"), requestRecordDTO.getCost()));
+	    }
+	    if (requestRecordDTO.getTime() != null) {
+	        predicates.add(cb.lessThanOrEqualTo(root.get("time"), requestRecordDTO.getTime()));
+	    }
+	    if (requestRecordDTO.getCapacity() != null) {
+	        predicates.add(cb.greaterThanOrEqualTo(root.get("capacity"), requestRecordDTO.getCapacity()));
+	    }
+	    if (requestRecordDTO.getLoadType() != null) {
+	        predicates.add(cb.equal(root.get("loadType"), requestRecordDTO.getLoadType()));
+	    }
+
+	    predicates.add(cb.equal(root.get("origin"), requestRecordDTO.getOrigin()));
+	    predicates.add(cb.equal(root.get("destination"), requestRecordDTO.getDestination()));
+
+	    criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
+
+	    return entityManager.createQuery(criteriaQuery).getResultList();
 	}
 
 	public WorkOrder createRequest(RequestRecordDTO requestRecordDTO) {
 		Workflow workflow=workflowRepository.findById(requestRecordDTO.getWorkflowId()).get().toBuilder().build();
 
 		List<Carriers> carriers=dynamicParamsQuery(requestRecordDTO);
-
+		System.out.println(carriers);
 		List<Nodes> nodes = workflow.getNodes();
 		List<Edges> edges = workflow.getEdges();
 		List<String> sortOrder=getSortOrder(nodes, edges);
@@ -162,6 +173,7 @@ public class RequestRecordService {
 													.cost(requestRecordDTO.getCost())
 													.time(requestRecordDTO.getTime())
 													.capacity(requestRecordDTO.getCapacity())
+													.loadType(requestRecordDTO.getLoadType())
 													.build();
 					requestRecordRepository.save(requestRecord);
 				}
@@ -177,6 +189,7 @@ public class RequestRecordService {
 												.cost(requestRecordDTO.getCost())
 												.time(requestRecordDTO.getTime())
 												.capacity(requestRecordDTO.getCapacity())
+												.loadType(requestRecordDTO.getLoadType())
 												.build();
 				requestRecordRepository.save(requestRecord);
 				break;
@@ -200,6 +213,7 @@ public class RequestRecordService {
 				.toBuilder()
 				.build();
 		requestRecord.status=requestRecordIdMap.getStatus();
+		System.out.println(requestRecord.getLoadType());
 		requestRecordRepository.save(requestRecord);
 		String operationType = searchOperationType(requestRecord.getWorkflow().getNodes());
 
@@ -235,6 +249,7 @@ public class RequestRecordService {
 													.cost(requestRecord.getCost())
 													.time(requestRecord.getTime())
 													.capacity(requestRecord.getCapacity())
+													.loadType(requestRecord.getLoadType())
 													.workflowId(requestRecordIdMap.getWorkflowId())
 													.build();
 				List<Carriers> carriers = dynamicParamsQuery(requestRecordDTO);
@@ -259,6 +274,7 @@ public class RequestRecordService {
 												.cost(requestRecord.getCost())
 												.time(requestRecord.getTime())
 												.capacity(requestRecord.getCapacity())
+												.loadType(requestRecord.getLoadType())
 												.build();
 				requestRecordRepository.save(newRequestRecord);
 				break;
@@ -295,6 +311,7 @@ public class RequestRecordService {
 							.time(requestRecordIt.getCarriers().getTime())
 							.capacity(requestRecordIt.getCarriers().getCapacity())
 							.status(requestRecordIt.getStatus())
+							.loadType(requestRecordIt.getCarriers().getLoadType())
 							.build());
 		}
 		WorkOrderByIdPage workOrderByIdPage = WorkOrderByIdPage.builder()
@@ -305,6 +322,7 @@ public class RequestRecordService {
 												.cost(requestRecord.getCost())
 												.time(requestRecord.getTime())
 												.capacity(requestRecord.getCapacity())
+												.loadType(requestRecord.getLoadType())
 												.carriers(carriers)
 												.build();
 		return workOrderByIdPage;

@@ -1,5 +1,7 @@
 package com.example.workflow.DTO;
 
+import com.example.workflow.model.Carriers;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +18,5 @@ public class RequestRecordDTO {
     private Integer cost;
     private Integer time;
     private Integer capacity;
-
+    private String loadType;
 }

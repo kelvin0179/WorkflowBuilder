@@ -43,4 +43,6 @@ public class RequestRecord {
     private Integer time;
 
     private Integer capacity;
+
+    private String loadType;
 }
