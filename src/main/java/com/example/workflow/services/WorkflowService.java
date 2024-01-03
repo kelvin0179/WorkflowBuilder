@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.example.workflow.DTO.WorkflowDTO;
 import com.example.workflow.model.Edges;
 import com.example.workflow.model.EdgesComposite;
 import com.example.workflow.model.Nodes;
@@ -81,5 +82,16 @@ public class WorkflowService {
 			maxId=Math.max(maxId,Integer.parseInt(node.getCompositeId().getId()));
 		}
 		return Optional.of(maxId+1);
+	}
+	public List<WorkflowDTO> getForWorkflowPage(){
+		List<Workflow> workflows=workflowRepository.findAll();
+		List<WorkflowDTO> workflowDTOs=new ArrayList<WorkflowDTO>();
+		for(Workflow workflow: workflows) {
+			workflowDTOs.add(WorkflowDTO.builder()
+					.id(workflow.getId())
+					.name(workflow.getName())
+					.build());
+		}
+		return workflowDTOs;
 	}
 }

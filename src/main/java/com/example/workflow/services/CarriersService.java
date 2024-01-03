@@ -6,6 +6,8 @@ import com.example.workflow.model.RequestRecord;
 import com.example.workflow.repository.CarriersRepository;
 import com.example.workflow.repository.RequestRecordRepository;
 
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class CarriersService {
 	
 	@Autowired

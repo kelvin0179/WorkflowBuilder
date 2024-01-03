@@ -1,8 +1,6 @@
 package com.example.workflow.DTO;
 
-import java.util.List;
-
-import com.example.workflow.model.Carriers;
+import com.example.workflow.model.RequestRecord;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,9 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class WorkOrderPageDTO {
+public class WorkflowDTO {
 	private int id;
 	private String name;
-	private List<String> nodeValues;
-	List<Carriers> carriers;
 }

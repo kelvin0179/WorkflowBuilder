@@ -48,6 +48,9 @@ public class RequestRecordService {
 	@Autowired
 	private RequestRecordRepository requestRecordRepository;
 
+	@Autowired
+	private CarriersService carriersService;
+
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -118,7 +121,7 @@ public class RequestRecordService {
 			criteriaQuery.select(root).where(cb.lessThanOrEqualTo(root.get(Carriers_.time), requestRecordDTO.getTime()));
 		}
 		if(requestRecordDTO.getCapacity()!=null){
-			criteriaQuery.select(root).where(cb.lessThanOrEqualTo(root.get(Carriers_.capacity), requestRecordDTO.getCapacity()));
+			criteriaQuery.select(root).where(cb.greaterThanOrEqualTo(root.get(Carriers_.capacity), requestRecordDTO.getCapacity()));
 		}
 		criteriaQuery.select(root).where(cb.equal(root.get(Carriers_.origin), requestRecordDTO.getOrigin()));
 		criteriaQuery.select(root).where(cb.equal(root.get(Carriers_.destination), requestRecordDTO.getDestination()));
@@ -273,6 +276,7 @@ public class RequestRecordService {
 					.id(workflow.getId())
 					.name(workflow.getName())
 					.nodeValues(nodeValues)
+					.carriers(carriersService.getAllCarriers())
 					.build());
 		}
 		return result;

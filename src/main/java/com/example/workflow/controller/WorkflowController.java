@@ -1,5 +1,7 @@
 package com.example.workflow.controller;
 
+import java.util.List;
+
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.workflow.DTO.WorkflowDTO;
 import com.example.workflow.model.Workflow;
 import com.example.workflow.repository.WorkflowRepository;
 import com.example.workflow.services.WorkflowService;
@@ -47,5 +50,8 @@ public class WorkflowController {
 		return ResponseEntity.ok(workflowService.getMaxAvailableId(id).get());
 	}
 	
-	
+	@GetMapping
+	public ResponseEntity<List<WorkflowDTO>> getForWorkflowPage(){
+		return ResponseEntity.ok(workflowService.getForWorkflowPage());
+	}
 }

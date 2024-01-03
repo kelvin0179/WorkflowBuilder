@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class WorkOrderByIdPage {
-	private String origin;
+	private String origin;	
 	private String destination;
 	private WorkOrder.Status status;
 	private String workflowName;

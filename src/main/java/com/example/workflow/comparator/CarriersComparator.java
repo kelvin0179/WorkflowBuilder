@@ -31,7 +31,7 @@ public class CarriersComparator implements Comparator<Carriers> {
             case "time":
                 return Integer.compare(carrier1.getTime(), carrier2.getTime());
             case "capacity":
-                return Integer.compare(carrier1.getCapacity(), carrier2.getCapacity());
+                return Integer.compare(carrier2.getCapacity(), carrier1.getCapacity());
             default:
                 throw new IllegalArgumentException("Invalid sorting field: " + field);
         }
