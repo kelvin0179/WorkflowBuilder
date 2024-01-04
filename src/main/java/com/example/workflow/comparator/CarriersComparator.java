@@ -23,7 +23,6 @@ public class CarriersComparator implements Comparator<Carriers> {
         }
         return 0;
     }
-
     private int compareField(Carriers carrier1, Carriers carrier2, String field) {
         switch (field) {
             case "cost":

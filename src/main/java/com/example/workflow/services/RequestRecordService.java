@@ -157,11 +157,17 @@ public class RequestRecordService {
 
 		if(carriers.isEmpty()){
 			workOrder.status=WorkOrder.Status.Rejected;
+			workOrder=workOrderRepository.save(workOrder).toBuilder().build();
+			RequestRecord requestRecord = RequestRecord.builder()
+					.workflow(workflow.toBuilder().build())
+					.workOrder(workOrder)
+					.build();
+			requestRecordRepository.save(requestRecord);
 			return workOrder;
 		}
 
 		workOrder=workOrderRepository.save(workOrder).toBuilder().build();
-
+		
 		switch (opertionType) {
 			case "BroadCast Request to All":{
 				for(Carriers car: carriers){
@@ -300,19 +306,28 @@ public class RequestRecordService {
 	public WorkOrderByIdPage getWorkOrderByIdPage(int workOrderId){
 		WorkOrder workOrder = workOrderRepository.findById(workOrderId).get().toBuilder().build();
 		List<RequestRecord> requestRecords=requestRecordRepository.findByWorkOrder(workOrder);
+		if(requestRecords.isEmpty()){
+			return WorkOrderByIdPage.builder()
+					.origin(workOrder.getOrigin())
+					.destination(workOrder.getDestination())
+					.status(workOrder.getStatus())
+					.build();
+		}
 		RequestRecord requestRecord = requestRecords.get(0);
 		List<WorkOrderDetailsCarrierDTO> carriers=new ArrayList<>();
 		
-		for(RequestRecord requestRecordIt : requestRecords){
-			carriers.add(WorkOrderDetailsCarrierDTO.builder()
-							.carrierId(requestRecordIt.getCarriers().getCapacity())
-							.truckId(requestRecordIt.getCarriers().getTruckId())
-							.cost(requestRecordIt.getCarriers().getCost())
-							.time(requestRecordIt.getCarriers().getTime())
-							.capacity(requestRecordIt.getCarriers().getCapacity())
-							.status(requestRecordIt.getStatus())
-							.loadType(requestRecordIt.getCarriers().getLoadType())
-							.build());
+		if(requestRecord.getCarriers()!=null) {
+			for(RequestRecord requestRecordIt : requestRecords){
+				carriers.add(WorkOrderDetailsCarrierDTO.builder()
+								.carrierId(requestRecordIt.getCarriers().getCapacity())
+								.truckId(requestRecordIt.getCarriers().getTruckId())
+								.cost(requestRecordIt.getCarriers().getCost())
+								.time(requestRecordIt.getCarriers().getTime())
+								.capacity(requestRecordIt.getCarriers().getCapacity())
+								.status(requestRecordIt.getStatus())
+								.loadType(requestRecordIt.getCarriers().getLoadType())
+								.build());
+			}
 		}
 		WorkOrderByIdPage workOrderByIdPage = WorkOrderByIdPage.builder()
 												.origin(workOrder.getOrigin())
