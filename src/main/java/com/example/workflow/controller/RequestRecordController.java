@@ -56,4 +56,9 @@ public class RequestRecordController {
 	public WorkOrderByIdPage getWorkOrderByIdPage(@PathVariable("id") Integer workflowId) {
 		return requestRecordService.getWorkOrderByIdPage(workflowId);
 	}
+
+	@GetMapping("/reassignCarriersToWorkOrder/{workOrderId}")
+	public void reassignCarriersToWorkOrder(@PathVariable("workOrderId") Integer workOrderId){
+		requestRecordService.reassignCarriersToWorkOrder(workOrderId);
+	}
 }

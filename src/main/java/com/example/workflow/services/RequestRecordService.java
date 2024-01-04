@@ -161,6 +161,11 @@ public class RequestRecordService {
 			RequestRecord requestRecord = RequestRecord.builder()
 					.workflow(workflow.toBuilder().build())
 					.workOrder(workOrder)
+					.status(RequestRecord.Status.Rejected)
+					.cost(requestRecordDTO.getCost())
+					.time(requestRecordDTO.getTime())
+					.capacity(requestRecordDTO.getCapacity())
+					.loadType(requestRecordDTO.getLoadType())
 					.build();
 			requestRecordRepository.save(requestRecord);
 			return workOrder;
@@ -316,9 +321,9 @@ public class RequestRecordService {
 		RequestRecord requestRecord = requestRecords.get(0);
 		List<WorkOrderDetailsCarrierDTO> carriers=new ArrayList<>();
 		
-		if(requestRecord.getCarriers()!=null) {
-			for(RequestRecord requestRecordIt : requestRecords){
-				carriers.add(WorkOrderDetailsCarrierDTO.builder()
+		for(RequestRecord requestRecordIt : requestRecords){
+			if(requestRecordIt.getCarriers()!=null){
+					carriers.add(WorkOrderDetailsCarrierDTO.builder()
 								.carrierId(requestRecordIt.getCarriers().getCapacity())
 								.truckId(requestRecordIt.getCarriers().getTruckId())
 								.cost(requestRecordIt.getCarriers().getCost())
@@ -341,5 +346,42 @@ public class RequestRecordService {
 												.carriers(carriers)
 												.build();
 		return workOrderByIdPage;
+	}
+	public void reassignCarriersToWorkOrder(Integer workOrderId){
+		WorkOrder workOrder=workOrderRepository.findById(workOrderId).get();
+		List<RequestRecord> requestRecords=requestRecordRepository.findByWorkOrder(workOrder);
+		List<Carriers> updatedCarriers = dynamicParamsQuery(RequestRecordDTO.builder()
+																.origin(workOrder.getOrigin())
+																.destination(workOrder.getDestination())
+																.cost(requestRecords.get(0).getCost())
+																.capacity(requestRecords.get(0).getCapacity())
+																.loadType(requestRecords.get(0).getLoadType())
+																.time(requestRecords.get(0).getTime())
+																.workflowId(requestRecords.get(0).getWorkflow().getId())
+																.build());
+		
+		List<Carriers> exisitngCarriers = new ArrayList<Carriers>();
+		for(RequestRecord requestRecord: requestRecords) {
+			if(requestRecord.getCarriers()!=null){
+				exisitngCarriers.add(requestRecord.getCarriers().toBuilder().build());
+			}
+		} 
+		updatedCarriers.removeAll(exisitngCarriers);
+		if(updatedCarriers.size()>0){
+			workOrder.status = WorkOrder.Status.Pending;
+			workOrderRepository.save(workOrder);
+			for(Carriers carriers: updatedCarriers){
+				requestRecordRepository.save(RequestRecord.builder()
+												.cost(requestRecords.get(0).getCost())
+												.capacity(requestRecords.get(0).getCapacity())
+												.loadType(requestRecords.get(0).getLoadType())
+												.time(requestRecords.get(0).getTime())
+												.carriers(carriers)
+												.workflow(requestRecords.get(0).getWorkflow())
+												.workOrder(workOrder)
+												.status(RequestRecord.Status.Assigned)
+												.build());
+			}
+		}
 	}
 }
